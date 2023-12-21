@@ -3,7 +3,7 @@ const app = express();
 require("dotenv").config();
 const port = process.env.PORT || 5000;
 const cors = require("cors");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 
 //|| MONGODB connection
 const uri = "mongodb://0.0.0.0:27017";
@@ -39,24 +39,36 @@ async function run() {
       res.send(users);
     });
 
+    // get single task for user (edit)
+    app.get("/task", async (req, res) => {
+      try {
+        const taskId = req.query.taskId;
+        if (taskId) {
+          console.log(taskId);
+          const task = await taskCollection.findOne({
+            _id: new ObjectId(taskId),
+          });
+          res.send(task);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    });
     // get all the tasks of an individual user
     app.get("/tasks", async (req, res) => {
-      const email = req.query.email
+      const email = req.query.email;
 
-      console.log(email)
-      const tasks = await taskCollection.find({email}).toArray();
+      console.log(email);
+      const tasks = await taskCollection.find({ email }).toArray();
       res.send(tasks);
     });
 
-
-
     // ========= PUT ==========
-    app.put("/task",async(req,res)=> {
-      const task = req.body
-
-    })
+    app.put("/task", async (req, res) => {
+      const task = req.body;
+    });
     // ========= POST ==========
-    // store single task 
+    // store single task
     app.post("/task", async (req, res) => {
       try {
         const task = req.body;
