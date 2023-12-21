@@ -63,10 +63,6 @@ async function run() {
       res.send(tasks);
     });
 
-    // ========= PUT ==========
-    app.put("/task", async (req, res) => {
-      const task = req.body;
-    });
     // ========= POST ==========
     // store single task
     app.post("/task", async (req, res) => {
@@ -78,6 +74,31 @@ async function run() {
       } catch (error) {
         console.log(error);
       }
+    });
+
+    // ========= PUT ==========
+    app.put("/task", async (req, res) => {
+      const taskId = req.query.id;
+      const updatedTaskData = req.body;
+
+      const filter = { _id: new ObjectId(taskId) };
+      const updateDoc = {
+        $set: updatedTaskData,
+      };
+
+      const result = await taskCollection.updateOne(filter, updateDoc);
+
+      res.send(result);
+    });
+
+    // ========= Delete ==========
+    app.delete("/task", async (req, res) => {
+      const taskId = req.query.id;
+
+      const filter = { _id: new ObjectId(taskId) };
+      const result = await taskCollection.deleteOne(filter);
+
+      res.send(result);
     });
 
     console.log(
