@@ -33,15 +33,29 @@ async function run() {
     const userCollection = database.collection("users");
     const taskCollection = database.collection("tasks");
 
+    // get all the users
     app.get("/users", async (req, res) => {
       const users = await userCollection.find().toArray();
       res.send(users);
     });
 
+    // get all the tasks of an individual user
+    app.get("/tasks", async (req, res) => {
+      const email = req.query.email
+
+      console.log(email)
+      const tasks = await taskCollection.find({email}).toArray();
+      res.send(tasks);
+    });
 
 
 
-    // ========= post ==========
+    // ========= PUT ==========
+    app.put("/task",async(req,res)=> {
+      const task = req.body
+
+    })
+    // ========= POST ==========
     // store single task 
     app.post("/task", async (req, res) => {
       try {
