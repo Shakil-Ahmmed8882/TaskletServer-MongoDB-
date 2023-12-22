@@ -6,13 +6,15 @@ const cors = require("cors");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 
 //|| MONGODB connection
-const uri = "mongodb://0.0.0.0:27017";
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.sk8jxpx.mongodb.net/?retryWrites=true&w=majority`;
+// const uri = "mongodb://0.0.0.0:27017";
+
 
 //middle ware
 app.use(express.json());
 app.use(
   cors({
-    origin: ["http://localhost:5173", "http://localhost:5174"],
+    origin: "*",
     credentials: true,
   })
 );
@@ -44,7 +46,7 @@ async function run() {
     app.get("/task", async (req, res) => {
       try {
         const taskId = req.query.taskId;
-        const state = req.query.state;
+        console.log(taskId);
 
         const result = await taskCollection.findOne(new ObjectId(taskId));
         return res.send(result);
@@ -57,22 +59,21 @@ async function run() {
       const email = req.query.email;
       const state = req.query.state;
 
-      let query = {}
-    // if sate is sent fetch the individual data
-    // based on email and state
-    
+      let query = {};
+      // if sate is sent fetch the individual data
+      // based on email and state
+
       if (state) {
         query = {
           email: email,
-          progress: state
+          progress: state,
         };
       } else {
-        console.log(email)
+        console.log(email);
         if (email) {
           query.email = email;
         }
       }
-
 
       const tasks = await taskCollection.find(query).toArray();
       res.send(tasks);
