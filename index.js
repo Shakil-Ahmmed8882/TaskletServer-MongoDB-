@@ -91,6 +91,29 @@ async function run() {
       res.send(result);
     });
 
+
+
+    
+    // ========= PATCh ==========
+    app.patch("/task", async (req, res) => {
+      const taskId = req.query.id;
+      const state = req.query.state;
+
+      const filter = { _id: new ObjectId(taskId) };
+      const task = await taskCollection.findOne(filter)
+      
+      
+      const updateDoc = {
+        $set:{
+          progress : state 
+        },
+      };
+
+      const result = await taskCollection.updateOne(filter, updateDoc);
+
+      console.log(result)
+      res.send(result);
+    });
     // ========= Delete ==========
     app.delete("/task", async (req, res) => {
       const taskId = req.query.id;
