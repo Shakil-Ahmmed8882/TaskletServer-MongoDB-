@@ -40,16 +40,14 @@ async function run() {
     });
 
     // get single task for user (edit)
+    // get single task for user (edit)
     app.get("/task", async (req, res) => {
       try {
         const taskId = req.query.taskId;
-        if (taskId) {
-          console.log(taskId);
-          const task = await taskCollection.findOne({
-            _id: new ObjectId(taskId),
-          });
-          res.send(task);
-        }
+        const state = req.query.state;
+
+        const result = await taskCollection.findOne(new ObjectId(taskId));
+        return res.send(result);
       } catch (error) {
         console.log(error);
       }
@@ -57,9 +55,26 @@ async function run() {
     // get all the tasks of an individual user
     app.get("/tasks", async (req, res) => {
       const email = req.query.email;
+      const state = req.query.state;
 
-      console.log(email);
-      const tasks = await taskCollection.find({ email }).toArray();
+      let query = {}
+    // if sate is sent fetch the individual data
+    // based on email and state
+    
+      if (state) {
+        query = {
+          email: email,
+          progress: state
+        };
+      } else {
+        console.log(email)
+        if (email) {
+          query.email = email;
+        }
+      }
+
+
+      const tasks = await taskCollection.find(query).toArray();
       res.send(tasks);
     });
 
@@ -91,27 +106,21 @@ async function run() {
       res.send(result);
     });
 
-
-
-    
     // ========= PATCh ==========
     app.patch("/task", async (req, res) => {
       const taskId = req.query.id;
       const state = req.query.state;
 
       const filter = { _id: new ObjectId(taskId) };
-      const task = await taskCollection.findOne(filter)
-      
-      
+
       const updateDoc = {
-        $set:{
-          progress : state 
+        $set: {
+          progress: state,
         },
       };
 
       const result = await taskCollection.updateOne(filter, updateDoc);
 
-      console.log(result)
       res.send(result);
     });
     // ========= Delete ==========
